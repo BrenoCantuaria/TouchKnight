@@ -130,8 +130,8 @@ public class CenaJogo extends AGScene
 
         //ANIMAÇÃO BOSS (INIMIGO)
         enemy.addAnimation(10,true,0,6);
-        enemy.addAnimation(10,true,7,13);
-        enemy.addAnimation(10,true,29);
+        enemy.addAnimation(10,false,7,13);
+        enemy.addAnimation(10,false,29,31);
         enemy.setCurrentAnimation(0);
 
         //Método de espelhamento dos sprites
@@ -149,21 +149,6 @@ public class CenaJogo extends AGScene
     public void stop()
     {
 
-    }
-
-    public void controleTempo()
-    {
-        this.atualizaAtaque.update();
-
-        if (this.atualizaAtaque.isTimeEnded())
-        {
-            this.timeValue++;
-            this.atualizaAtaque.restart();
-        }
-        if (this.timeValue <= 1000)
-        {
-            this.enemy.setCurrentAnimation((this.timeValue % 100) / 10);
-        }
     }
 
     @Override
@@ -184,42 +169,35 @@ public class CenaJogo extends AGScene
         {
            if (hero.getCurrentAnimationIndex() == 0)
            {
-                   hero.moveTo(200, hero.vrPosition.getX()+50 ,hero.vrPosition.getY() );
+                   hero.moveTo(250, hero.vrPosition.getX()+75 ,hero.vrPosition.getY() );
                    hero.setCurrentAnimation(1);
            }
         }
 
         if(hero.collide(colisor))
         {
-            /*if(enemy.getCurrentAnimationIndex() == 0)
+            if(enemy.getCurrentAnimationIndex() == 0)
             {
                 enemy.setCurrentAnimation(2);
-                enemy.setCurrentAnimation(0);
             }
             else if(enemy.getCurrentAnimationIndex() == 1)
             {
                 enemy.setCurrentAnimation(2);
-                enemy.setCurrentAnimation(1);
-            }*/
+            }
 
             vida_monstro[indice].bVisible = false;
             indice++;
             hero.moveTo(1000,AGScreenManager.iScreenHeight/3.0f, AGScreenManager.iScreenWidth/4.0f);
         }
 
-        if(hero.collide(enemy))
-        {
-            final boolean b = hero.collide(enemy) == false;
-            
-        }
-
-        if(vida_monstro[4].bVisible == false)
+        if(!vida_monstro[4].bVisible)
         {
             this.vrGameManager.setCurrentScene(2);
             return;
         }
 
 
+        //TENTEI ISSO MAS SÓ DA MERDA
         /*if(enemy.collide(hero))
         {
             vida_personagem[indice].bVisible = false;
@@ -240,17 +218,16 @@ public class CenaJogo extends AGScene
         }
 
         //INIMIGO, ANIMAÇÃO DO LOOP DE ATAQUE
-        //controleTempo();
 
-        if(enemy.getCurrentAnimationIndex() == 0)
+
+        /*if(enemy.getCurrentAnimationIndex() == 0)
         {
             enemy.setCurrentAnimation(1);
-        }
+        }*/
 
         if(enemy.getCurrentAnimation().isAnimationEnded())
         {
             enemy.setCurrentAnimation(0);
         }
-
     }
 }
