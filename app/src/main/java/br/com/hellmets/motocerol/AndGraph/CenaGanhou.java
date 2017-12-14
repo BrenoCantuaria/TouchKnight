@@ -19,6 +19,7 @@ public class CenaGanhou extends AGScene
     @Override
     public void init()
     {
+        //Sprite que indica que o jogador ganhouo
         ganhou = this.createSprite(R.mipmap.imagem_vencedor, 1,1);
         ganhou.setScreenPercent(30,30);
 

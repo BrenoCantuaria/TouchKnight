@@ -19,6 +19,7 @@ public class CenaPerdeu extends AGScene
     @Override
     public void init()
     {
+        //Sprite que indica que o jogador perdeu
         perdeu = this.createSprite(R.mipmap.imagem_perdedor, 1,1);
         perdeu.setScreenPercent(30,30);
 
