@@ -197,18 +197,22 @@ public class CenaJogo extends AGScene
         }
 
 
+        //SEM ESSA PARTE FUNCIONA vvvvvvvvvvvvvv
         //TENTEI ISSO MAS SÓ DA MERDA
-        /*if(enemy.collide(hero))
+        if(enemy.collide(enemy))
         {
             vida_personagem[indice].bVisible = false;
-            indice++;
+            //indice++;
+            return;
         }
 
-        if(vida_personagem[0].bVisible == false)
+        /*if(!vida_personagem[0].bVisible)
         {
             this.vrGameManager.setCurrentScene(3);
             return;
         }*/
+
+        //ATE AQUI ^^^^^^^^^^^^^^^
 
         //Se a animação atual (que no caso é a de ataque) do personagem chegar ao fim,
         //voltará para a animação inicial pré determinada
