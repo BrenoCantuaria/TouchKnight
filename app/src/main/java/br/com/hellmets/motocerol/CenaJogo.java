@@ -268,6 +268,7 @@ public class CenaJogo extends AGScene
 
                 //Se o Boss colidir com o personagem
                 //As vidas do Personagem desaparece
+                //ESTA PARTE AINDA NÃO ESTA FUNCIONANDO COMO DEVERIA
                 if (enemy.collide(colisor2))
                 {
                     vida_personagem[i].bVisible = false;
@@ -282,6 +283,7 @@ public class CenaJogo extends AGScene
                     i = 0;
                     return;
                 }
+                //AQUI FINALIZA
 
                 auxFlag.restart();
 
