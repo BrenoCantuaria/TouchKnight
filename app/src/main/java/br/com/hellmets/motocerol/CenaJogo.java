@@ -20,14 +20,22 @@ public class CenaJogo extends AGScene
     AGSprite [] vida_personagem = null;
     AGSprite [] vida_monstro = null;
     AGSprite colisor = null;
+    AGSprite colisor2 = null;
     AGSprite back = null;
 
     AGTimer atualizaAtaque = null;
     AGTimer temporizador = null;
+    AGTimer ataqueBoss = null;
+    AGTimer auxFlag = null;
     int timeValue;
 
-    //Flag de controle dos indices
+    //Flags de controle
     int indice = 0;
+    int flag = 0;
+
+    boolean inimigoAtacou = false;
+
+    boolean inverter = false;
 
     //Construtor da Classe
     public CenaJogo(AGGameManager manager)
@@ -41,6 +49,9 @@ public class CenaJogo extends AGScene
         //Inicialização das variáveis
         atualizaAtaque = new AGTimer();
         temporizador = new AGTimer();
+        ataqueBoss = new AGTimer();
+        auxFlag = new AGTimer();
+
         vida_monstro = new AGSprite[5];
         vida_personagem = new AGSprite[3];
 
@@ -77,6 +88,9 @@ public class CenaJogo extends AGScene
         colisor = this.createSprite(R.mipmap.barra, 1,1);
         colisor.setScreenPercent(7,7);
 
+        colisor2 = this.createSprite(R.mipmap.barra, 1,1);
+        colisor2.setScreenPercent(7,7);
+
         //Configura ALTURA e LARGURA de todos os sprites na tela do celular
         back.vrPosition.setX(AGScreenManager.iScreenWidth/2);
         back.vrPosition.setY(AGScreenManager.iScreenHeight/2);
@@ -84,17 +98,17 @@ public class CenaJogo extends AGScene
         icone_personagem.vrPosition.setX(AGScreenManager.iScreenHeight/9.5f);
         icone_personagem.vrPosition.setY(AGScreenManager.iScreenWidth/1.8f);
 
-        //**************** VIDAS PERSONAGEM, apresentados em um vetor
-        vida_personagem[2].vrPosition.setX(AGScreenManager.iScreenHeight/2.2f);
-        vida_personagem[2].vrPosition.setY(AGScreenManager.iScreenWidth/1.8f);
+        //** VIDAS PERSONAGEM, apresentados em um vetor
+        vida_personagem[0].vrPosition.setX(AGScreenManager.iScreenHeight/2.2f);
+        vida_personagem[0].vrPosition.setY(AGScreenManager.iScreenWidth/1.8f);
 
         vida_personagem[1].vrPosition.setX(AGScreenManager.iScreenHeight/2.8f);
         vida_personagem[1].vrPosition.setY(AGScreenManager.iScreenWidth/1.8f);
 
-        vida_personagem[0].vrPosition.setX(AGScreenManager.iScreenHeight/3.8f);
-        vida_personagem[0].vrPosition.setY(AGScreenManager.iScreenWidth/1.8f);
+        vida_personagem[2].vrPosition.setX(AGScreenManager.iScreenHeight/3.8f);
+        vida_personagem[2].vrPosition.setY(AGScreenManager.iScreenWidth/1.8f);
 
-        //**************** VIDAS BOSS, apresentados em um vetor
+        //** VIDAS BOSS, apresentados em um vetor
         vida_monstro[4].vrPosition.setX(AGScreenManager.iScreenHeight/0.66f);
         vida_monstro[4].vrPosition.setY(AGScreenManager.iScreenWidth/16.7f);
 
@@ -110,8 +124,11 @@ public class CenaJogo extends AGScene
         vida_monstro[0].vrPosition.setX(AGScreenManager.iScreenHeight/1.42f);
         vida_monstro[0].vrPosition.setY(AGScreenManager.iScreenWidth/16.7f);
 
-        hero.vrPosition.setX(AGScreenManager.iScreenHeight/3.0f);
+        hero.vrPosition.setX(AGScreenManager.iScreenHeight/3f);
         hero.vrPosition.setY(AGScreenManager.iScreenWidth/4.0f);
+
+        colisor2.vrPosition.setX(AGScreenManager.iScreenHeight/3f);
+        colisor2.vrPosition.setY(AGScreenManager.iScreenWidth/4.0f);
 
         colisor.vrPosition.setX(AGScreenManager.iScreenHeight/1.0f);
         colisor.vrPosition.setY(AGScreenManager.iScreenWidth/4.0f);
@@ -121,6 +138,7 @@ public class CenaJogo extends AGScene
 
         //Seta para invisivel o colisor
         colisor.bVisible = false;
+        colisor2.bVisible = false;
 
         //Cria a animação com os sprites selecionados
         //ANIMAÇÃO PERRSONAGEM
@@ -130,7 +148,7 @@ public class CenaJogo extends AGScene
 
         //ANIMAÇÃO BOSS (INIMIGO)
         enemy.addAnimation(10,true,0,6);
-        enemy.addAnimation(10,false,7,13);
+        enemy.addAnimation(10,!true,7,13);
         enemy.addAnimation(10,false,29,31);
         enemy.setCurrentAnimation(0);
 
@@ -154,6 +172,8 @@ public class CenaJogo extends AGScene
     @Override
     public void loop()
     {
+        ataqueBoss.update();
+
         //Método de volta para o menu principal do jogo
         //Ao clicar no botão de voltar do celular, volta para a cena de menu
         if(AGInputManager.vrTouchEvents.backButtonClicked())
@@ -167,13 +187,14 @@ public class CenaJogo extends AGScene
         //Ao clicar na tela, é gerado a ação de ataque do persongem
         if(AGInputManager.vrTouchEvents.screenClicked())
         {
-           if (hero.getCurrentAnimationIndex() == 0)
-           {
-                   hero.moveTo(250, hero.vrPosition.getX()+75 ,hero.vrPosition.getY() );
-                   hero.setCurrentAnimation(1);
-           }
+            if (hero.getCurrentAnimationIndex() == 0)
+            {
+                hero.moveTo(250, hero.vrPosition.getX()+75 ,hero.vrPosition.getY() );
+                hero.setCurrentAnimation(1);
+            }
         }
 
+        //Heroi batendo no boss
         if(hero.collide(colisor))
         {
             if(enemy.getCurrentAnimationIndex() == 0)
@@ -187,7 +208,9 @@ public class CenaJogo extends AGScene
 
             vida_monstro[indice].bVisible = false;
             indice++;
-            hero.moveTo(1000,AGScreenManager.iScreenHeight/3.0f, AGScreenManager.iScreenWidth/4.0f);
+            hero.moveTo(1000,AGScreenManager.iScreenHeight/3f, AGScreenManager.iScreenWidth/4.0f);
+
+            //movehero();
         }
 
         if(!vida_monstro[4].bVisible)
@@ -195,24 +218,6 @@ public class CenaJogo extends AGScene
             this.vrGameManager.setCurrentScene(2);
             return;
         }
-
-
-        //SEM ESSA PARTE FUNCIONA vvvvvvvvvvvvvv
-        //TENTEI ISSO MAS SÓ DA MERDA
-        if(enemy.collide(enemy))
-        {
-            vida_personagem[indice].bVisible = false;
-            //indice++;
-            return;
-        }
-
-        /*if(!vida_personagem[0].bVisible)
-        {
-            this.vrGameManager.setCurrentScene(3);
-            return;
-        }*/
-
-        //ATE AQUI ^^^^^^^^^^^^^^^
 
         //Se a animação atual (que no caso é a de ataque) do personagem chegar ao fim,
         //voltará para a animação inicial pré determinada
@@ -223,15 +228,77 @@ public class CenaJogo extends AGScene
 
         //INIMIGO, ANIMAÇÃO DO LOOP DE ATAQUE
 
-
-        /*if(enemy.getCurrentAnimationIndex() == 0)
+        //Verifica se o inimigo já atacou
+        if(ataqueBoss.isTimeEnded())
         {
-            enemy.setCurrentAnimation(1);
-        }*/
+            int i = 2;
+            double aleatorio = Math.random();
+
+            if (aleatorio > 0.5)
+            {
+                while(!auxFlag.isTimeEnded() && flag != 2)
+                {
+                    auxFlag.update();
+
+                    if(auxFlag.isTimeEnded())
+                    {
+                        flag++;
+                    }
+                }
+                auxFlag.restart();
+
+                if(enemy.getCurrentAnimationIndex() == 0 )
+                {
+                    enemy.setCurrentAnimation(1);
+
+                    /*if (enemy.collide(colisor2))
+                    {
+                        vida_personagem[i].bVisible = false;
+                        i++;
+                    }
+
+
+                    if(vida_personagem[0].bVisible == false)
+                    {
+                        this.vrGameManager.setCurrentScene(1);
+                        return;
+                    }*/
+                }
+            }
+            else
+            {
+                while(!auxFlag.isTimeEnded() && flag != 3)
+                {
+                    auxFlag.update();
+
+                    if(auxFlag.isTimeEnded())
+                    {
+                        flag++;
+                    }
+                }
+                auxFlag.restart();
+
+                if(enemy.getCurrentAnimationIndex() == 1 )
+                {
+                    enemy.setCurrentAnimation(0);
+                }
+            }
+
+            ataqueBoss.restart();
+        }
 
         if(enemy.getCurrentAnimation().isAnimationEnded())
         {
             enemy.setCurrentAnimation(0);
         }
     }
+
+   /* public void movehero()
+    {
+        if(hero.collide(enemy) && inverter == true)
+        {
+            hero.collide(enemy) = false;
+            hero.moveTo(1000,AGScreenManager.iScreenHeight/1.8f, AGScreenManager.iScreenWidth/4.0f);
+        }
+    }*/
 }
