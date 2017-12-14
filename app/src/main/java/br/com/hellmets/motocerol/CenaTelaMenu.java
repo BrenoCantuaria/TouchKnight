@@ -27,8 +27,6 @@ public class CenaTelaMenu extends AGScene
     @Override
     public void init()
     {
-        //tempo = new AGTimer(4000);
-
         //Métodos de criação dos Sprites tanto para animação quanto de background
         //Aqui são setados também os parametros de proporção dos Sprites
         fundo_inicial = this.createSprite(R.mipmap.initial_background, 1,1);

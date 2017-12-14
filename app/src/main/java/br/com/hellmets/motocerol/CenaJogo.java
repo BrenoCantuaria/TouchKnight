@@ -23,19 +23,16 @@ public class CenaJogo extends AGScene
     AGSprite colisor2 = null;
     AGSprite back = null;
 
+    //Instância das variáveis (TIME)
     AGTimer atualizaAtaque = null;
     AGTimer temporizador = null;
     AGTimer ataqueBoss = null;
     AGTimer auxFlag = null;
-    int timeValue;
 
     //Flags de controle
     int indice = 0;
+    int i = 0;
     int flag = 0;
-
-    boolean inimigoAtacou = false;
-
-    boolean inverter = false;
 
     //Construtor da Classe
     public CenaJogo(AGGameManager manager)
@@ -63,14 +60,14 @@ public class CenaJogo extends AGScene
         icone_personagem = this.createSprite(R.mipmap.faceset, 1,1);
         icone_personagem.setScreenPercent(10,15);
 
-        //Sprites de vida do Boss
+        //Sprites de vida do PERSONAGEM
         for (int i = 0; i < 3; i++ )
         {
             vida_personagem[i] = this.createSprite(R.mipmap.defesa_personagem, 1, 1);
             vida_personagem[i].setScreenPercent(5, 10);
         }
 
-        //Sprites de vida do Boss
+        //Sprites de vida do BOSS
         for(int i = 0; i < 5; i++)
         {
             vida_monstro[i] = this.createSprite(R.mipmap.vida_monstro, 1,1);
@@ -98,7 +95,7 @@ public class CenaJogo extends AGScene
         icone_personagem.vrPosition.setX(AGScreenManager.iScreenHeight/9.5f);
         icone_personagem.vrPosition.setY(AGScreenManager.iScreenWidth/1.8f);
 
-        //** VIDAS PERSONAGEM, apresentados em um vetor
+        //** VIDAS PERSONAGEM, apresentados em um vetor na tela
         vida_personagem[0].vrPosition.setX(AGScreenManager.iScreenHeight/2.2f);
         vida_personagem[0].vrPosition.setY(AGScreenManager.iScreenWidth/1.8f);
 
@@ -108,7 +105,7 @@ public class CenaJogo extends AGScene
         vida_personagem[2].vrPosition.setX(AGScreenManager.iScreenHeight/3.8f);
         vida_personagem[2].vrPosition.setY(AGScreenManager.iScreenWidth/1.8f);
 
-        //** VIDAS BOSS, apresentados em um vetor
+        //** VIDAS BOSS, apresentados em um vetor na tela
         vida_monstro[4].vrPosition.setX(AGScreenManager.iScreenHeight/0.66f);
         vida_monstro[4].vrPosition.setY(AGScreenManager.iScreenWidth/16.7f);
 
@@ -124,10 +121,10 @@ public class CenaJogo extends AGScene
         vida_monstro[0].vrPosition.setX(AGScreenManager.iScreenHeight/1.42f);
         vida_monstro[0].vrPosition.setY(AGScreenManager.iScreenWidth/16.7f);
 
-        hero.vrPosition.setX(AGScreenManager.iScreenHeight/3f);
+        hero.vrPosition.setX(AGScreenManager.iScreenHeight/3.0f);
         hero.vrPosition.setY(AGScreenManager.iScreenWidth/4.0f);
 
-        colisor2.vrPosition.setX(AGScreenManager.iScreenHeight/3f);
+        colisor2.vrPosition.setX(AGScreenManager.iScreenHeight/3.0f);
         colisor2.vrPosition.setY(AGScreenManager.iScreenWidth/4.0f);
 
         colisor.vrPosition.setX(AGScreenManager.iScreenHeight/1.0f);
@@ -172,6 +169,8 @@ public class CenaJogo extends AGScene
     @Override
     public void loop()
     {
+
+        //Atualiza a flag
         ataqueBoss.update();
 
         //Método de volta para o menu principal do jogo
@@ -183,20 +182,23 @@ public class CenaJogo extends AGScene
             return;
         }
 
+        //PERSONAGEM, ANIMAÇÃO DE ATAQUE E DE MOVIMENTO
         //Método de ataque do personagem
-        //Ao clicar na tela, é gerado a ação de ataque do persongem
+        //Ao clicar na tela, é gerado a ação de ataque do persongem e a movimentação
         if(AGInputManager.vrTouchEvents.screenClicked())
         {
             if (hero.getCurrentAnimationIndex() == 0)
             {
-                hero.moveTo(250, hero.vrPosition.getX()+75 ,hero.vrPosition.getY() );
+                hero.moveTo(250, hero.vrPosition.getX()+95 ,hero.vrPosition.getY() );
                 hero.setCurrentAnimation(1);
             }
         }
 
-        //Heroi batendo no boss
+        //Método de colisão do personagem para contabilizar o dano
+        //Quando contabilizado, retorna para a posição inicial
         if(hero.collide(colisor))
         {
+            //Adicionam a animação de "DEBILITADO" do Boss
             if(enemy.getCurrentAnimationIndex() == 0)
             {
                 enemy.setCurrentAnimation(2);
@@ -209,13 +211,14 @@ public class CenaJogo extends AGScene
             vida_monstro[indice].bVisible = false;
             indice++;
             hero.moveTo(1000,AGScreenManager.iScreenHeight/3f, AGScreenManager.iScreenWidth/4.0f);
-
-            //movehero();
         }
 
+        //Se a vida do Boss chegar no limite do vetor
+        //Retorna para a página de menu do jogo
         if(!vida_monstro[4].bVisible)
         {
             this.vrGameManager.setCurrentScene(2);
+            indice = 0;
             return;
         }
 
@@ -226,12 +229,10 @@ public class CenaJogo extends AGScene
             hero.setCurrentAnimation(0);
         }
 
-        //INIMIGO, ANIMAÇÃO DO LOOP DE ATAQUE
-
+        //INIMIGO, ANIMAÇÃO DO LOOP E RANDOMIZAÇÃO DE ATAQUE
         //Verifica se o inimigo já atacou
         if(ataqueBoss.isTimeEnded())
         {
-            int i = 2;
             double aleatorio = Math.random();
 
             if (aleatorio > 0.5)
@@ -251,21 +252,9 @@ public class CenaJogo extends AGScene
                 {
                     enemy.setCurrentAnimation(1);
 
-                    /*if (enemy.collide(colisor2))
-                    {
-                        vida_personagem[i].bVisible = false;
-                        i++;
-                    }
-
-
-                    if(vida_personagem[0].bVisible == false)
-                    {
-                        this.vrGameManager.setCurrentScene(1);
-                        return;
-                    }*/
                 }
             }
-            else
+            else //Senão
             {
                 while(!auxFlag.isTimeEnded() && flag != 3)
                 {
@@ -276,6 +265,24 @@ public class CenaJogo extends AGScene
                         flag++;
                     }
                 }
+
+                //Se o Boss colidir com o personagem
+                //As vidas do Personagem desaparece
+                if (enemy.collide(colisor2))
+                {
+                    vida_personagem[i].bVisible = false;
+                    i++;
+                }
+
+                //Se alcançar o limite de vidas do personagem
+                //É chamado a cena de "PERDEU"
+                if(vida_personagem[0].bVisible == false)
+                {
+                    this.vrGameManager.setCurrentScene(3);
+                    i = 0;
+                    return;
+                }
+
                 auxFlag.restart();
 
                 if(enemy.getCurrentAnimationIndex() == 1 )
@@ -283,22 +290,13 @@ public class CenaJogo extends AGScene
                     enemy.setCurrentAnimation(0);
                 }
             }
-
             ataqueBoss.restart();
         }
 
+        //Retorna para a animação inicial do Boss
         if(enemy.getCurrentAnimation().isAnimationEnded())
         {
             enemy.setCurrentAnimation(0);
         }
     }
-
-   /* public void movehero()
-    {
-        if(hero.collide(enemy) && inverter == true)
-        {
-            hero.collide(enemy) = false;
-            hero.moveTo(1000,AGScreenManager.iScreenHeight/1.8f, AGScreenManager.iScreenWidth/4.0f);
-        }
-    }*/
 }
